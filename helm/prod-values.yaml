@@ -1,0 +1,50 @@
+fullname: routebox-tracking-events
+
+replicaCount: 3
+
+image:
+  repository: 414866527708.dkr.ecr.us-east-1.amazonaws.com/tracking-events
+  tag: latest
+  pullPolicy: IfNotPresent
+
+namespace: tracking-events
+
+service:
+  type: ClusterIP
+  port: 8080
+
+config:
+  ENV: production
+  LOG_LEVEL: warn
+  PORT: "8080"
+  AWS_REGION: us-east-1
+
+secrets:
+  DATABASE_URL: ""
+  AWS_ACCESS_KEY_ID: ""
+  AWS_SECRET_ACCESS_KEY: ""
+  CARRIER_SIGNATURE_SECRETS: ""
+
+resources:
+  requests:
+    cpu: 250m
+    memory: 128Mi
+  limits:
+    cpu: 1000m
+    memory: 512Mi
+
+livenessProbe:
+  httpGet:
+    path: /healthz
+    port: 8080
+  initialDelaySeconds: 20
+  periodSeconds: 15
+  failureThreshold: 3
+
+readinessProbe:
+  httpGet:
+    path: /readyz
+    port: 8080
+  initialDelaySeconds: 20
+  periodSeconds: 10
+  failureThreshold: 2
